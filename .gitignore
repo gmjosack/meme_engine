@@ -1,0 +1,3 @@
+app.yaml
+meme_engine/static/vendor
+*.py[co]

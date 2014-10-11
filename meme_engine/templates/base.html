@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+    <head>
+        <title>MemeEngine</title>
+        <link href="/static/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" media="screen">
+        <link href="/static/css/meme-engine.css" rel="stylesheet" media="screen">
+        {% block extra_head %} {% endblock %}
+    </head>
+    <body>
+
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <nav class="navbar navbar-static-top navbar-default" role="navigation">
+                    <a class="navbar-brand" href="/">meme-engine.</a>
+                </nav>
+            </div>
+
+            <div class="row content">
+                <div class="col-md-10 col-md-offset-1">
+                    {% block content %} {% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/vendor/jquery/dist/jquery.min.js"></script>
+        <script src="/static/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+        {% block script %} {% endblock %}
+    </body>
+</html>
+{% endautoescape %}

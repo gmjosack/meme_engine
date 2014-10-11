@@ -1,0 +1,31 @@
+application: "<FILL ME OUT>"
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+
+handlers:
+    - url: /favicon.ico
+      static_files: meme_engine/static/favicon.ico
+      upload: meme_engine/static/favicon/ico
+      login: required
+      secure: always
+
+    - url: /static
+      static_dir: meme_engine/static
+      login: required
+      secure: always
+
+    - url: /.*
+      script: meme_engine.app.application
+      login: required
+      secure: always
+
+
+libraries:
+    - name: webapp2
+      version: "2.5.2"
+
+    - name: jinja2
+      version: "2.6"
