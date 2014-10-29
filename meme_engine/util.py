@@ -1,14 +1,17 @@
 from hashlib import md5
 
+import base64
 import jinja2
 import json
 import os
+import re
 import webapp2
 
 from google.appengine.api import users
 from google.appengine.api import images
 
 
+DATAURL_RE = re.compile("data:image/(png|jpeg);base64,(.*)$")
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(
@@ -17,6 +20,11 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True
 )
+
+
+def trim_data_url(data_url):
+    image = DATAURL_RE.match(data_url).group(2)
+    return base64.b64decode(image)
 
 
 class MemeEngineRequestHandler(webapp2.RequestHandler):

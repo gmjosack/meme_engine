@@ -1,9 +1,10 @@
+import json
 import re
 
 from google.appengine.ext import db
 from google.appengine.api import images
 
-from .util import MemeEngineRequestHandler, get_image
+from .util import MemeEngineRequestHandler, get_image, trim_data_url
 from .models import Template, Meme
 
 
@@ -31,6 +32,38 @@ class ListTemplates(MemeEngineRequestHandler):
         })
 
 
+class UploadMeme(MemeEngineRequestHandler):
+    def post(self):
+
+
+        request = json.loads(self.request.body)
+
+        print request["texts"]
+        print request["template"]
+
+        image_data = trim_data_url(request["image"])
+        image = images.Image(image_data=image_data)
+
+        print image.width, image.height
+
+        template = db.get(request["template"]["key"])
+
+        meme = Meme(
+            top_text=request["texts"]["topText"],
+            bottom_text=request["texts"]["bottomText"],
+            template=template,
+            author=self.email,
+            width=image.width,
+            height=image.height,
+            image=image_data
+        )
+        meme.put()
+
+        self.render_json({
+            "id": meme.key().id(),
+        })
+
+
 class TemplatesView(MemeEngineRequestHandler):
     def get(self):
         templates = Template.all().run()
@@ -43,14 +76,21 @@ class TemplateView(MemeEngineRequestHandler):
         self.render("template.html", template=template)
 
 
+class MemesView(MemeEngineRequestHandler):
+    def get(self):
+        memes = Meme.all().order("-added").run()
+        self.render("meme.html", memes=memes)
+
+
+class MemeView(MemeEngineRequestHandler):
+    def get(self, meme_id):
+        meme = Meme.get_by_id(int(meme_id))
+        self.render("meme.html", meme=meme)
+
+
 class CreateMeme(MemeEngineRequestHandler):
     def get(self):
         self.render("create_meme.html")
-
-
-class Index(MemeEngineRequestHandler):
-    def get(self):
-        self.render("index.html", user=self.get_current_user())
 
 
 class Image(MemeEngineRequestHandler):
@@ -87,8 +127,8 @@ class AddTemplate(MemeEngineRequestHandler):
             return self.render("add_template.html", error=err)
 
         try:
-            Template.upload(name, self.email, template_image)
+            template = Template.upload(name, self.email, template_image)
         except ValueError as err:
             return self.render("add_template.html", error=err)
 
-        self.render("add_template.html")
+        self.redirect("/template/%s" % template.key().id())

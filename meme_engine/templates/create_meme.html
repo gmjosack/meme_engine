@@ -10,6 +10,7 @@
                 </div>
             </div>
             <div class="col-md-4">
+                <div ng-if="errMsg" class="alert alert-danger">[[errMsg]]</div>
 
                 <div class="form-group">
                     <label>Template</label>
@@ -33,7 +34,7 @@
                            class="form-control"
                     >
                 </div>
-                <div><button class="btn btn-danger">Create!</button></div>
+                <div><button class="btn btn-danger" ng-disabled="!selectedTemplate || uploading" ng-click="uploadMeme()">Create!</button></div>
             </div>
         </div>
     </div>
@@ -80,6 +81,8 @@
             "$scope", "$http",
             function($scope, $http){
 
+        $scope.errMsg = null;
+        $scope.uploading = false;
         $scope.memeImage = new Image();
         $scope.memeCanvas = document.getElementById("meme-canvas");
         $scope.templates = [];
@@ -90,6 +93,7 @@
         };
 
         $scope.$watch("selectedTemplate", function(newV, oldV) {
+            if (!newV) return;
             $scope.setSrc(newV);
         });
 
@@ -120,6 +124,27 @@
 
         $scope.setSrc = function(template){
             $scope.memeImage.src = "/image?key=" + template.key;
+        };
+
+        $scope.uploadMeme = function() {
+            if (!$scope.selectedTemplate) return;
+
+            $scope.uploading = true;
+
+            var canvasData = $scope.memeCanvas.toDataURL();
+            data = {
+                texts: $scope.texts,
+                image: canvasData,
+                template: $scope.selectedTemplate
+            }
+
+            $http.post("/rpc/upload_meme", data).success(function(data){
+                window.location.href = "/meme/" + data.data.id;
+            }).error(function(data, status, headers){
+                $scope.errMsg = "Failed to upload: " + status
+                $scope.uploading = false;
+            });
+
         };
 
         $scope.memeImage.onload = function(){

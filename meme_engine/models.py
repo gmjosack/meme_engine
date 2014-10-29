@@ -60,11 +60,14 @@ class Template(db.Model):
             **template_image
         )
         template.put()
+        return template
 
 
 class Meme(db.Model):
     top_text = db.StringProperty()
     bottom_text = db.StringProperty()
+
+    template = db.ReferenceProperty(Template, collection_name="memes", required=True)
 
     author = db.StringProperty(required=True)
 

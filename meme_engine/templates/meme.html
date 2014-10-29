@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% if meme %}
+
+        <div class="text-center">
+            <img width="{{meme.width}}", height="{{meme.height}}" src="/image?key={{meme.key()}}">
+
+            <hr>
+
+            <div>
+                <strong>Top Text:</strong> {{ meme.top_text }}
+            </div>
+            <div>
+                <strong>Bottom Text:</strong> {{ meme.bottom_text }}
+            </div>
+            <div>
+                <strong>Added By:</strong> {{ meme.author }}
+            </div>
+            <div>
+                <strong>Added On:</strong> {{ meme.added }}
+            </div>
+        </div>
+
+    {% else %}
+        {% for meme in memes %}
+            <a href="/meme/{{meme.key().id()}}">
+                <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
+            </a>
+        {% endfor %}
+
+    {% endif %}
+
+{% endblock %}

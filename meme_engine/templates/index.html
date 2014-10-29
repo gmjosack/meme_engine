@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-   Welcome to MemeEngine, {{user.nickname()}}
+    {% for meme in memes %}
+        <a href="/meme/{{meme.key().id()}}">
+            <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
+        </a>
+    {% endfor %}
 {% endblock %}
