@@ -1,3 +1,4 @@
+import datetime
 
 from google.appengine.ext import db
 
@@ -20,6 +21,8 @@ class Template(db.Model):
     image_hash = db.StringProperty(required=True)
 
     added = db.DateTimeProperty(required=True, auto_now_add=True)
+
+    enabled = db.BooleanProperty(default=True)
 
     @property
     def thumb_width(self):
@@ -77,6 +80,13 @@ class Meme(db.Model):
 
     added = db.DateTimeProperty(required=True, auto_now_add=True)
 
+    enabled = db.BooleanProperty(default=True)
+
+    votes_up = db.IntegerProperty(default=0)
+    votes_down = db.IntegerProperty(default=0)
+
+    votes_avg = db.IntegerProperty(default=0)
+
     @property
     def thumb_width(self):
         return get_size(self.width, self.height, THUMB_WIDTH, THUMB_HEIGHT)[0]
@@ -84,3 +94,22 @@ class Meme(db.Model):
     @property
     def thumb_height(self):
         return get_size(self.width, self.height, THUMB_WIDTH, THUMB_HEIGHT)[1]
+
+
+class MemeComment(db.Model):
+
+    author = db.StringProperty(required=True)
+    comment = db.TextProperty(required=True)
+
+    meme = db.ReferenceProperty(Meme, collection_name="comments", required=True)
+
+    added = db.DateTimeProperty(required=True, auto_now_add=True)
+
+    enabled = db.BooleanProperty(default=True)
+
+    def as_dict(self):
+        return {
+            "author": self.author,
+            "comment": self.comment,
+            "added": str(self.added),
+        }

@@ -10,6 +10,7 @@ application = webapp2.WSGIApplication([
 
     ('/meme', handlers.MemesView),
     ('/meme/(?P<meme_id>[\d]+)/?', handlers.MemeView),
+    ('/meme/(?P<meme_id>[\d]+)/add_comment/?', handlers.AddMemeComment),
 
     ('/add_template', handlers.AddTemplate),
     ('/create_meme', handlers.CreateMeme),
@@ -18,5 +19,8 @@ application = webapp2.WSGIApplication([
 
     ('/rpc/list_templates', handlers.ListTemplates),
     ('/rpc/upload_meme', handlers.UploadMeme),
+    ('/rpc/list_meme_comments/(?P<meme_id>[\d]+)/?', handlers.ListMemeComments),
+
+    # ('/admin/__update_schema', handlers.UpdateSchema),
 
 ], debug=True)

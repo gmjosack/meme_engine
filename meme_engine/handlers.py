@@ -5,7 +5,7 @@ from google.appengine.ext import db
 from google.appengine.api import images
 
 from .util import MemeEngineRequestHandler, get_image, trim_data_url
-from .models import Template, Meme
+from .models import Template, Meme, MemeComment
 
 
 def normalize_name(name):
@@ -25,11 +25,34 @@ class ListTemplates(MemeEngineRequestHandler):
             name = normalize_name(name)
             templates.filter("name >=", name).filter('name <', name + u'\ufffd')
 
-        templates.run(limit=15)
-
         self.render_json({
             "templates": [template.as_dict() for template in templates]
         })
+
+
+class ListMemeComments(MemeEngineRequestHandler):
+    def get(self, meme_id):
+        meme = Meme.get_by_id(int(meme_id))
+
+        self.render_json({
+            "comments": [comment.as_dict() for comment in meme.comments.order("added")]
+        })
+
+
+class AddMemeComment(MemeEngineRequestHandler):
+
+    def post(self, meme_id):
+
+        meme = Meme.get_by_id(int(meme_id))
+
+        comment = self.request.get("comment")
+        if not comment:
+            self.redirect("/meme/%s" % meme.key().id())
+
+        comment = MemeComment(comment=comment, author=self.email, meme=meme)
+        comment.put()
+
+        self.redirect("/meme/%s" % meme.key().id())
 
 
 class UploadMeme(MemeEngineRequestHandler):
@@ -38,13 +61,8 @@ class UploadMeme(MemeEngineRequestHandler):
 
         request = json.loads(self.request.body)
 
-        print request["texts"]
-        print request["template"]
-
         image_data = trim_data_url(request["image"])
         image = images.Image(image_data=image_data)
-
-        print image.width, image.height
 
         template = db.get(request["template"]["key"])
 
@@ -132,3 +150,14 @@ class AddTemplate(MemeEngineRequestHandler):
             return self.render("add_template.html", error=err)
 
         self.redirect("/template/%s" % template.key().id())
+
+
+class UpdateSchema(MemeEngineRequestHandler):
+    def get(self):
+        memes = Meme.all()
+        for meme in memes:
+            meme.put()
+
+        templates = Template.all()
+        for template in templates:
+            template.put()

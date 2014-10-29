@@ -4,22 +4,48 @@
 
     {% if meme %}
 
-        <div class="text-center">
-            <img width="{{meme.width}}", height="{{meme.height}}" src="/image?key={{meme.key()}}">
+        <div ng-app="memeEngineMeme" ng-controller="ViewMemeController" class="row">
+            <div class="col-md-6">
+                <img width="{{meme.width}}", height="{{meme.height}}" src="/image?key={{meme.key()}}">
+            </div>
+            <div class="col-md-4">
+                <div>
+                    <strong>Top Text:</strong> {{ meme.top_text }}
+                </div>
+                <div>
+                    <strong>Bottom Text:</strong> {{ meme.bottom_text }}
+                </div>
+                <div>
+                    <strong>Added By:</strong> {{ meme.author }}
+                </div>
+                <div>
+                    <strong>Added On:</strong> {{ meme.added }}
+                </div>
 
-            <hr>
+                <hr>
 
-            <div>
-                <strong>Top Text:</strong> {{ meme.top_text }}
-            </div>
-            <div>
-                <strong>Bottom Text:</strong> {{ meme.bottom_text }}
-            </div>
-            <div>
-                <strong>Added By:</strong> {{ meme.author }}
-            </div>
-            <div>
-                <strong>Added On:</strong> {{ meme.added }}
+                <div><strong>Discussion:</strong></div>
+                <br>
+
+                <div ng-if="comments === null" class="text-center">
+                    <i class="fa fa-2x fa-spinner fa-spin"></i>
+                </div>
+
+                <div ng-if="comments !== null">
+                    <blockquote ng-if="comments.length" ng-repeat="comment in comments">
+                        [[comment.comment]]
+                        <footer>[[comment.author]]</footer>
+                    </blockquote>
+
+                    <form role="form" method="post" action="/meme/{{meme.key().id()}}/add_comment">
+                        <div class="form-group">
+                            <textarea placeholder="Comment" class="form-control" ng-model="comment" name="comment"></textarea>
+                        </div>
+                        <input ng-disabled="!comment.length" class="btn btn-danger" type="submit" value="Add Comment">
+                    </form>
+                </div>
+
+
             </div>
         </div>
 
@@ -33,3 +59,41 @@
     {% endif %}
 
 {% endblock %}
+
+{% block script %}
+{% if meme %}
+<script src="/static/vendor/angular/angular.js"></script>
+<script type="text/javascript">
+(function(){
+
+    var app = angular.module("memeEngineMeme", []);
+
+    app.config(function($interpolateProvider){
+        $interpolateProvider.startSymbol("[[");
+        $interpolateProvider.endSymbol("]]");
+    })
+    .config(function($logProvider){
+        $logProvider.debugEnabled(true);
+    })
+    .config(function($locationProvider) {
+        $locationProvider.html5Mode(true);
+    });
+
+    app.controller("ViewMemeController", [
+            "$scope", "$http",
+            function($scope, $http){
+
+        $scope.comment = "";
+        $scope.comments = null;
+
+        $http.get("/rpc/list_meme_comments/{{meme.key().id()}}").success(function(data){
+            $scope.comments = data.data.comments;
+        });
+
+    }]);
+
+})();
+</script>
+{% endif %}
+{% endblock %}
+
