@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+    {% if template %}
+
+        <div class="text-center">
+            <img width="{{template.width}}", height="{{template.height}}" src="/image?key={{template.key()}}">
+
+            <hr>
+
+            <div>
+                <strong>Name:</strong> {{ template.name }}
+            </div>
+            <div>
+                <strong>Added By:</strong> {{ template.author }}
+            </div>
+            <div>
+                <strong>Added On:</strong> {{ template.added }}
+            </div>
+        </div>
+
+    {% else %}
+        {% for template in templates %}
+            <a href="/template/{{template.key().id()}}">
+                <img width="{{template.thumb_width}}", height="{{template.thumb_height}}" src="/image?key={{template.key()}}">
+            </a>
+        {% endfor %}
+
+    {% endif %}
+
+{% endblock %}
