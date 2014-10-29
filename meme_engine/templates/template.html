@@ -5,7 +5,7 @@
     {% if template %}
 
         <div class="text-center">
-            <img width="{{template.width}}", height="{{template.height}}" src="/image?key={{template.key()}}">
+            <img class="template-img" src="/image?key={{template.key()}}">
 
             <hr>
 
@@ -23,7 +23,7 @@
     {% else %}
         {% for template in templates %}
             <a href="/template/{{template.key().id()}}">
-                <img width="{{template.thumb_width}}", height="{{template.thumb_height}}" src="/image?key={{template.key()}}">
+                <img class="thumbnail-img" width="{{template.thumb_width}}", height="{{template.thumb_height}}" src="/image?key={{template.key()}}">
             </a>
         {% endfor %}
 

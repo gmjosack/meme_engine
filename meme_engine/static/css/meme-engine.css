@@ -16,6 +16,18 @@ blockquote {
     font-size: 15px;
 }
 
+.meme-img {
+    max-width: 100%;
+}
+
+.template-img {
+    max-width: 100%;
+}
+
+.thumbnail-img {
+    padding: 5px;
+}
+
 .navbar-default {
     background-color: #343434;
     border-color: #a3114f;

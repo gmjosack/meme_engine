@@ -6,7 +6,7 @@
 
         <div ng-app="memeEngineMeme" ng-controller="ViewMemeController" class="row">
             <div class="col-md-6">
-                <img width="{{meme.width}}", height="{{meme.height}}" src="/image?key={{meme.key()}}">
+                <img class="meme-img" src="/image?key={{meme.key()}}">
             </div>
             <div class="col-md-4">
                 <div>
@@ -52,7 +52,7 @@
     {% else %}
         {% for meme in memes %}
             <a href="/meme/{{meme.key().id()}}">
-                <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
+                <img class="thumbnail-img" width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
             </a>
         {% endfor %}
 
