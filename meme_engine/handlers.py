@@ -96,7 +96,7 @@ class TemplateView(MemeEngineRequestHandler):
 
 class MemesView(MemeEngineRequestHandler):
     def get(self):
-        memes = Meme.all().order("-added").run()
+        memes = Meme.all().filter("enabled = ", True).order("-added").run()
         self.render("meme.html", memes=memes)
 
 
