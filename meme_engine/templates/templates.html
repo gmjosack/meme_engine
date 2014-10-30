@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% for template in templates %}
+        <a href="/template/{{template.key().id()}}">
+            <div class="thumbnail-img">
+                <img width="{{template.thumb_width}}", height="{{template.thumb_height}}" src="/image?key={{template.key()}}">
+            </div>
+        </a>
+    {% endfor %}
+{% endblock %}

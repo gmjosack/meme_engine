@@ -10,31 +10,41 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div ng-if="errMsg" class="alert alert-danger">[[errMsg]]</div>
+                <div ng-if="templates">
+                    <div ng-if="errMsg" class="alert alert-danger">[[errMsg]]</div>
 
-                <div class="form-group">
-                    <label>Template</label>
-                    <select class="form-control" ng-model="selectedTemplate"
-                            ng-options="template.name for template in templates"
-                            focus
-                    ></select>
-                </div>
+                    <div class="form-group">
+                        <label>Template</label>
+                        <select class="form-control" ng-model="$parent.selectedTemplate"
+                                ng-options="template.name for template in templates"
+                                focus
+                        ></select>
+                    </div>
 
-                <div class="form-group">
-                    <input type="text" ng-model="texts.topText"
-                           ng-keyup="writeText()" id="top-text"
-                           placeholder="Top Text"
-                           class="form-control"
-                      >
+                    <div class="form-group">
+                        <input type="text" ng-model="texts.topText"
+                               ng-keyup="writeText()" id="top-text"
+                               placeholder="Top Text"
+                               class="form-control"
+                          >
+                    </div>
+                    <div class="form-group">
+                        <input type="text" ng-model="texts.bottomText"
+                               ng-keyup="writeText()" id="bottom-text"
+                               placeholder="Bottom Text"
+                               class="form-control"
+                        >
+                    </div>
+                    <div>
+                        <button class="btn btn-danger"
+                                ng-disabled="!selectedTemplate || uploading"
+                                ng-click="uploadMeme()">Create!
+                        </button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="text" ng-model="texts.bottomText"
-                           ng-keyup="writeText()" id="bottom-text"
-                           placeholder="Bottom Text"
-                           class="form-control"
-                    >
+                <div ng-if="!templates">
+                    <i class="fa fa-2x fa-spinner fa-spin"></i>
                 </div>
-                <div><button class="btn btn-danger" ng-disabled="!selectedTemplate || uploading" ng-click="uploadMeme()">Create!</button></div>
             </div>
         </div>
     </div>
@@ -70,9 +80,9 @@
 
     var getFontSize = function(width, height, text){
         var maxHeight = height / 8;
-        var minHeight = height / 16;
+        var minHeight = height / 12;
 
-        var fontSize = lerp(maxHeight, minHeight, text.length * 15 / width);
+        var fontSize = lerp(maxHeight, minHeight, text.length * 5 / width);
 
         return clamp(fontSize, minHeight, maxHeight);
     };
@@ -85,7 +95,7 @@
         $scope.uploading = false;
         $scope.memeImage = new Image();
         $scope.memeCanvas = document.getElementById("meme-canvas");
-        $scope.templates = [];
+        $scope.templates = null;
         $scope.selectedTemplate = null;
         $scope.texts = {
             topText: "",
@@ -93,6 +103,7 @@
         };
 
         $scope.$watch("selectedTemplate", function(newV, oldV) {
+            console.log(newV, oldV);
             if (!newV) return;
             $scope.setSrc(newV);
         });

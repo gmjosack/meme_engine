@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+        {% for meme in memes %}
+            <a href="/meme/{{meme.key().id()}}">
+                <div class="thumbnail-img">
+                    <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
+                </div>
+            </a>
+        {% endfor %}
+{% endblock %}

@@ -24,8 +24,16 @@ blockquote {
     max-width: 100%;
 }
 
-.thumbnail-img {
-    padding: 5px;
+div.thumbnail-img {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 410px;
+    text-align: center;
+    height: 410px;
+    width: 410px;
+    margin: 5px;
+
+    background-color: whitesmoke;
 }
 
 .navbar-default {
