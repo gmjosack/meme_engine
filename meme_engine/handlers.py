@@ -148,6 +148,17 @@ class CreateMeme(MemeEngineRequestHandler):
 
 class Image(MemeEngineRequestHandler):
     def get(self):
+
+        self.response.headers["Content-Type"] = "image/png"
+        self.response.headers["Cache-Control"] = "max-age=31556926"
+        # These never change. Data taken from Last-Modified example in
+        # rfc2616 and is otherwise arbitrary.
+        self.response.headers["Last-Modified"] = "Tue, 15 Nov 1994 12:45:26 GMT"
+        self.response.headers["Expires"] = "Mon, 23 Jan 2023 00:00:00 GMT"
+
+        if "If-Modified-Since" in self.request.headers:
+            return self.response.set_status(304)
+
         try:
             image = db.get(self.request.get("key"))
         except db.BadKeyError:
@@ -155,15 +166,6 @@ class Image(MemeEngineRequestHandler):
 
         if image is None:
             return self.error(404)
-
-        self.response.headers["Content-Type"] = "image/png"
-        self.response.headers["Cache-Control"] = "max-age=31556926"
-        # These never change. Data taken from Last-Modified example in
-        # rfc2616 and is otherwise arbitrary.
-        self.response.headers["Last-Modified"] = "Tue, 15 Nov 1994 12:45:26 GMT"
-
-        if "If-Modified-Since" in self.request.headers:
-            return self.response.set_status(304)
 
         self.response.out.write(image.image)
 
