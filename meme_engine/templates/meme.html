@@ -4,6 +4,10 @@
     <div ng-app="memeEngineMeme" ng-controller="ViewMemeController" class="row">
         <div class="col-md-6">
             <img class="meme-img" src="/image?key={{meme.key()}}">
+            <hr>
+            {% if author == meme.author %}
+                <a class="btn btn-danger" href="/meme/{{meme.key().id()}}/delete">Delete Meme</a>
+            {% endif %}
         </div>
         <div class="col-md-4">
             <div>

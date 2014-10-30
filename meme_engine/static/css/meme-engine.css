@@ -32,8 +32,31 @@ div.thumbnail-img {
     height: 410px;
     width: 410px;
     margin: 5px;
-
+    position: relative;
     background-color: whitesmoke;
+    border-radius: 5px;
+    box-shadow: 2px 2px 3px 1px rgba(216, 216, 216, 1);
+}
+
+span.num-comments {
+    position: absolute;
+    top: 185px;
+    left: 15px;
+    z-index: 10;
+    color: #d9534f;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: large;
+}
+
+span.delete-meme {
+    position: absolute;
+    top: -190px;
+    left: 10px;
+    z-index: 10;
+    color: #d9534f;
+}
+
+span.num-comments {
 }
 
 .navbar-default {

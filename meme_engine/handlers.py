@@ -49,8 +49,11 @@ class AddMemeComment(MemeEngineRequestHandler):
         if not comment:
             self.redirect("/meme/%s" % meme.key().id())
 
+
         comment = MemeComment(comment=comment, author=self.email, meme=meme)
         comment.put()
+        meme.num_comments = meme.num_comments + 1
+        meme.put()
 
         self.redirect("/meme/%s" % meme.key().id())
 
@@ -107,7 +110,35 @@ class MemeView(MemeEngineRequestHandler):
         if not meme.enabled:
             return self.error(404)
 
-        self.render("meme.html", meme=meme)
+        self.render("meme.html", meme=meme, author=self.email)
+
+
+class DeleteMeme(MemeEngineRequestHandler):
+    def get(self, meme_id):
+        meme = Meme.get_by_id(int(meme_id))
+
+        if not meme.enabled:
+            return self.error(404)
+
+        if meme.author != self.email:
+            return self.error(403)
+
+        self.render("delete-meme.html", meme=meme, author=self.email)
+
+    def post(self, meme_id):
+        print meme_id
+        meme = Meme.get_by_id(int(meme_id))
+
+        if not meme.enabled:
+            return self.error(404)
+
+        if meme.author != self.email:
+            return self.error(403)
+
+        meme.enabled = False
+        meme.put()
+
+        self.redirect("/")
 
 
 class CreateMeme(MemeEngineRequestHandler):
@@ -172,3 +203,16 @@ class UpdateSchema(MemeEngineRequestHandler):
         templates = Template.all()
         for template in templates:
             template.put()
+
+        meme_comments = MemeComment.all()
+        for meme_comment in meme_comments:
+            meme_comment.put()
+
+
+class FixCommentCounts(MemeEngineRequestHandler):
+    def get(self):
+        memes = Meme.all()
+        for meme in memes:
+            meme.num_comments = meme.comments.count()
+            meme.put()
+

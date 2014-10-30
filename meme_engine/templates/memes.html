@@ -5,6 +5,7 @@
             <a href="/meme/{{meme.key().id()}}">
                 <div class="thumbnail-img">
                     <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
+                    <span class="num-comments">{{meme.num_comments}} <i class="fa fa-comments"></i></span>
                 </div>
             </a>
         {% endfor %}

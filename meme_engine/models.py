@@ -87,6 +87,8 @@ class Meme(db.Model):
 
     votes_avg = db.IntegerProperty(default=0)
 
+    num_comments = db.IntegerProperty(default=0)
+
     @property
     def thumb_width(self):
         return get_size(self.width, self.height, THUMB_WIDTH, THUMB_HEIGHT)[0]
