@@ -15,9 +15,7 @@ This project uses bower to pull in it's third-party dependencies
 so after cloning and `cd`ing into the base directory run
 
 ```bash
-
 bower install
-
 ```
 
 ## Development
@@ -27,9 +25,7 @@ and you should replace the `application:` value to the name of
 your application. Once that is done you can run
 
 ```bash
-
 dev_appserver.py --log_level=debug
-
 ```
 
 ## Uploading to AppEngine
