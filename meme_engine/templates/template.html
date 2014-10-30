@@ -2,8 +2,9 @@
 
 {% block content %}
     <div class="text-center">
+        <a class="btn btn-danger" href="/create_meme?key={{template.key()}}">Create Meme From Template</a>
+        <hr>
         <img class="template-img" src="/image?key={{template.key()}}">
-
         <hr>
 
         <div>
