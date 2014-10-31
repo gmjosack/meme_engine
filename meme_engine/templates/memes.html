@@ -1,12 +1,22 @@
 {% extends "base.html" %}
+{% from 'macros/pagination.html' import paginator %}
 
 {% block content %}
-        {% for meme in memes %}
-            <a href="/meme/{{meme.key().id()}}">
-                <div class="thumbnail-img">
-                    <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
-                    <span class="num-comments">{{meme.num_comments}} <i class="fa fa-comments"></i></span>
-                </div>
-            </a>
-        {% endfor %}
+    <div class="text-center">
+        {{ paginator(offset, limit, args, memes|length) }}
+    </div>
+    <hr>
+    {% for meme in memes %}
+        <a href="/meme/{{meme.key().id()}}">
+            <div class="thumbnail-img">
+                <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
+                <span class="num-comments">{{meme.num_comments}} <i class="fa fa-comments"></i></span>
+            </div>
+        </a>
+    {% endfor %}
+    <hr>
+
+    <div class="text-center">
+        {{ paginator(offset, limit, args, memes|length) }}
+    </div>
 {% endblock %}

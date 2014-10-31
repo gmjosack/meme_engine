@@ -87,20 +87,38 @@ class UploadMeme(MemeEngineRequestHandler):
 
 class TemplatesView(MemeEngineRequestHandler):
     def get(self):
-        templates = Template.all().run()
-        self.render("templates.html", templates=templates)
+
+        offset = int(self.request.get("offset", 0))
+        limit = int(self.request.get("limit", 20))
+        if limit > 20:
+            limit = 20
+
+        templates = Template.all().filter("enabled = ", True).order("-added").fetch(limit, offset)
+
+        self.render("templates.html", templates=templates, args=self.request.GET, offset=offset, limit=limit)
 
 
 class TemplateView(MemeEngineRequestHandler):
     def get(self, template_id):
         template = Template.get_by_id(int(template_id))
+
+        if not template.enabled:
+            return self.error(404)
+
         self.render("template.html", template=template)
 
 
 class MemesView(MemeEngineRequestHandler):
     def get(self):
-        memes = Meme.all().filter("enabled = ", True).order("-added").run()
-        self.render("memes.html", memes=memes)
+
+        offset = int(self.request.get("offset", 0))
+        limit = int(self.request.get("limit", 20))
+        if limit > 20:
+            limit = 20
+
+        memes = Meme.all().filter("enabled = ", True).order("-added").fetch(limit, offset)
+
+        self.render("memes.html", memes=memes, args=self.request.GET, offset=offset, limit=limit)
 
 
 class MemeView(MemeEngineRequestHandler):

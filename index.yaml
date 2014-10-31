@@ -26,3 +26,9 @@ indexes:
   - name: meme
   - name: added
     direction: desc
+
+- kind: Template
+  properties:
+  - name: enabled
+  - name: added
+    direction: desc

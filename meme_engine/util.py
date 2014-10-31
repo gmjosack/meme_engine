@@ -1,4 +1,5 @@
 from hashlib import md5
+import urllib
 
 import base64
 import jinja2
@@ -20,6 +21,15 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     extensions=['jinja2.ext.autoescape'],
     autoescape=True
 )
+
+
+def update_qs(qs, **kwargs):
+    print qs
+    qs = qs.copy()
+    qs.update(kwargs)
+    return "?" + urllib.urlencode(qs, True)
+
+JINJA_ENVIRONMENT.globals.update({"update_qs": update_qs})
 
 
 def trim_data_url(data_url):

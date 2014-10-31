@@ -1,3 +1,7 @@
+.container-fluid {
+    margin-bottom: 20px;
+}
+
 .btn {
     border-radius: 1px;
 }
@@ -46,6 +50,7 @@ span.num-comments {
     color: #d9534f;
     font-family: Verdana, Geneva, sans-serif;
     font-size: large;
+    max-height: 20px;
 }
 
 span.delete-meme {
