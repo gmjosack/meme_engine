@@ -2,10 +2,6 @@
 {% from 'macros/pagination.html' import paginator %}
 
 {% block content %}
-    <div class="text-center">
-        {{ paginator(offset, limit, args, memes|length) }}
-    </div>
-    <hr>
     {% for template in templates %}
         <a href="/template/{{template.key().id()}}">
             <div class="thumbnail-img">
