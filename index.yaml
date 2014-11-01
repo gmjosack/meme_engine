@@ -32,3 +32,14 @@ indexes:
   - name: enabled
   - name: added
     direction: desc
+
+- kind: Template
+  properties:
+  - name: enabled
+  - name: name
+
+- kind: Template
+  properties:
+  - name: enabled
+  - name: name
+    direction: desc

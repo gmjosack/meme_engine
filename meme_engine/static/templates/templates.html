@@ -4,3 +4,26 @@
     </div>
 </a>
 <hr>
+
+<div class="btn-group">
+
+    <a class="btn btn-danger"
+       ng-href="?offset=0"
+       ng-class="{disabled: (search.offset|int) === 0}"
+    ><i class="fa fa-angle-double-left"></i></a>
+
+    <a class="btn btn-danger"
+       ng-href="?offset=[[(search.offset|int) - (search.limit|int)]]"
+       ng-class="{disabled: (search.offset|int) === 0}"
+    ><i class="fa fa-angle-left"></i></a>
+
+    <a class="btn btn-danger disabled"
+    >Page [[ (((search.offset|int) + (search.limit|int))) / (search.limit|int) ]]</a>
+
+    <a class="btn btn-danger"
+       ng-href="?offset=[[(search.offset|int) + (search.limit|int)]]"
+       ng-class="{disabled: templates.length < search.limit}"
+    ><i class="fa fa-angle-right"></i></a>
+
+</div>
+

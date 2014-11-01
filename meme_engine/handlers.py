@@ -56,6 +56,10 @@ class TemplatesHandler(MemeEngineRequestHandler):
         if limit > 20:
             limit = 20
 
+        # Override limit and fetch all. This is used right now
+        # for creating memes.
+        get_all = bool(self.request.get("all", False))
+
         templates = Template.all()
 
         name = self.request.get("name")
@@ -64,7 +68,11 @@ class TemplatesHandler(MemeEngineRequestHandler):
             templates = templates.filter("name >=", name).filter('name <', name + u'\ufffd')
 
         templates = templates.filter("enabled =", True)
-        templates = templates.order("-added").fetch(limit, offset)
+
+        if get_all:
+            templates = templates.order("name")
+        else:
+            templates = templates.order("-added").fetch(limit, offset)
 
 
         self.render_json({

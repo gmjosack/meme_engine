@@ -62,10 +62,14 @@
     });
 
     app.controller("MemesController", [
-            "$scope", "$http",
-            function($scope, $http) {
+            "$scope", "$http", "$location",
+            function($scope, $http, $location) {
 
         $scope.memes = null;
+        $scope.search = _.defaults($location.search(), {
+            limit: 20,
+            offset: 0
+        });
 
         $scope.vote = function(meme, score) {
             // If You're clicking on something you've already voted for
@@ -81,7 +85,7 @@
             });
         };
 
-        $http.get("/api/meme").success(function(data){
+        $http.get("/api/meme", {params: $scope.search}).success(function(data){
             $scope.memes = data.data.memes;
         });
 
@@ -115,11 +119,16 @@
     }]);
 
     app.controller("TemplatesController", [
-            "$scope", "$http",
-            function($scope, $http) {
+            "$scope", "$http", "$location",
+            function($scope, $http, $location) {
 
+        $scope.search = _.defaults($location.search(), {
+            limit: 20,
+            offset: 0
+        });
         $scope.templates = [];
-        $http.get("/api/template").success(function(data){
+
+        $http.get("/api/template", {params: $scope.search}).success(function(data){
             $scope.templates = data.data.templates;
         });
 
@@ -176,7 +185,7 @@
             return clamp(fontSize, minHeight, maxHeight);
         };
 
-        $http.get("/api/template").success(function(data){
+        $http.get("/api/template?all=1").success(function(data){
             $scope.templates = data.data.templates;
 
             var search = $location.search();
@@ -245,5 +254,11 @@
         };
 
     }]);
+
+    app.filter('int', function() {
+        return function(input) {
+            return parseInt(input, 10);
+        };
+    });
 
 })();
