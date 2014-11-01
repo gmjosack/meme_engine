@@ -19,8 +19,10 @@ application = webapp2.WSGIApplication([
     ('/image', handlers.Image),
 
     ('/rpc/list_templates', handlers.ListTemplates),
+    ('/rpc/list_memes', handlers.ListMemes),
     ('/rpc/upload_meme', handlers.UploadMeme),
     ('/rpc/list_meme_comments/(?P<meme_id>[\d]+)/?', handlers.ListMemeComments),
+    ('/rpc/vote/(?P<meme_id>[\d]+)/?', handlers.VoteForMeme),
 
     ('/admin/__update_schema', handlers.UpdateSchema),
     ('/admin/__fix_comment_counts', handlers.FixCommentCounts),

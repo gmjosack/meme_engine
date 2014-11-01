@@ -51,7 +51,45 @@ span.num-comments {
     font-family: Verdana, Geneva, sans-serif;
     font-size: large;
     max-height: 20px;
+    text-shadow: 1px 1px black, -1px -1px white;
 }
+
+span.num-comments:hover {
+    text-shadow: none;
+}
+
+div.votes {
+    position: absolute;
+    top: 185px;
+    right: 15px;
+    z-index: 10;
+    color: #d9534f;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: large;
+    max-height: 20px;
+}
+
+.votes a,
+.votes a:link,
+.votes a:hover,
+.votes a:active,
+.votes a:focus {
+    color: #d9534f;
+}
+
+.votes a:hover {
+    cursor: pointer;
+}
+
+.vote {
+    text-shadow: 1px 1px black, -1px -1px white;
+}
+
+a.vote:hover {
+    text-shadow: none;
+    text-decoration: none;
+}
+
 
 span.delete-meme {
     position: absolute;
@@ -59,9 +97,6 @@ span.delete-meme {
     left: 10px;
     z-index: 10;
     color: #d9534f;
-}
-
-span.num-comments {
 }
 
 .navbar-default {

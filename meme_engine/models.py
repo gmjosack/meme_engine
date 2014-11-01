@@ -1,6 +1,7 @@
 import datetime
 
 from google.appengine.ext import db
+from google.appengine.api import memcache
 
 from .util import get_size
 
@@ -35,6 +36,7 @@ class Template(db.Model):
     def as_dict(self):
         return {
             "key": str(self.key()),
+            "id": self.key().id(),
             "name": self.name,
             "author": self.author,
             "width": self.width,
@@ -64,6 +66,10 @@ class Template(db.Model):
         )
         template.put()
         return template
+
+
+class Vote(db.Model):
+    score = db.IntegerProperty(default=0)
 
 
 class Meme(db.Model):
@@ -96,6 +102,41 @@ class Meme(db.Model):
     @property
     def thumb_height(self):
         return get_size(self.width, self.height, THUMB_WIDTH, THUMB_HEIGHT)[1]
+
+    def get_vote_for_author(self, author):
+        meme_id = self.key().id()
+        key_name = "vote-%s-%s" % (meme_id, author)
+
+        score = memcache.get(key_name)
+        if score is not None:
+            return score
+
+        vote = Vote.get_by_key_name(key_name)
+        if vote is None:
+            memcache.set(key_name, 0)
+            return 0
+
+        memcache.set(key_name, vote.score)
+        return vote.score
+
+
+    def as_dict(self, author=None):
+        ret = {
+            "key": str(self.key()),
+            "id": self.key().id(),
+
+            "thumb_width": self.thumb_width,
+            "thumb_height": self.thumb_height,
+            "num_comments": self.num_comments,
+
+            "votes_up": self.votes_up,
+            "votes_down": self.votes_down,
+        }
+
+        if author:
+            ret["score"] = self.get_vote_for_author(author)
+
+        return ret
 
 
 class MemeComment(db.Model):

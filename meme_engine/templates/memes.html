@@ -2,17 +2,83 @@
 {% from 'macros/pagination.html' import paginator %}
 
 {% block content %}
-    {% for meme in memes %}
-        <a href="/meme/{{meme.key().id()}}">
-            <div class="thumbnail-img">
-                <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
-                <span class="num-comments">{{meme.num_comments}} <i class="fa fa-comments"></i></span>
+    <div ng-app="memeEngineMemes" ng-controller="ViewMemesController">
+        <div ng-repeat="meme in memes" class="thumbnail-img">
+            <a ng-href="/meme/[[meme.id]]">
+                <img width="[[meme.thumb_width]]", height="[[meme.thumb_height]]" ng-src="/image?key=[[meme.key]]">
+                <span class="num-comments">[[meme.num_comments]] <i class="fa fa-comments"></i></span>
+            </a>
+            <div class=votes>
+                <span class="vote">[[ meme.votes_up - meme.votes_down ]]</span>
+                <a class="vote" title="Dislike!" ng-click="vote(meme, -1)">
+                    <i ng-class="{
+                            'fa-thumbs-down': meme.score === -1,
+                            'fa-thumbs-o-down': meme.score !== -1}"
+                       class="fa fa-thumbs-o-down"></i>
+                </a>
+                <a class="vote" title="Like!" ng-click="vote(meme, 1)">
+                    <i ng-class="{
+                            'fa-thumbs-up': meme.score === 1,
+                            'fa-thumbs-o-up': meme.score !== 1}"
+                       class="fa fa-thumbs-o-up"></i>
+                </a>
             </div>
-        </a>
-    {% endfor %}
-    <hr>
+        </div>
+        <hr>
 
-    <div class="text-center">
-        {{ paginator(offset, limit, args, memes|length) }}
+        <!--
+        <div class="text-center">
+            {# paginator(offset, limit, args, memes|length) #}
+        </div>
+        -->
     </div>
+{% endblock %}
+
+
+{% block extra_head %}
+<script src="/static/vendor/angular/angular.js"></script>
+<script type="text/javascript">
+(function(){
+
+    var app = angular.module("memeEngineMemes", []);
+
+    app.config(function($interpolateProvider){
+        $interpolateProvider.startSymbol("[[");
+        $interpolateProvider.endSymbol("]]");
+    })
+    .config(function($logProvider){
+        $logProvider.debugEnabled(true);
+    })
+    .config(function($locationProvider) {
+        $locationProvider.html5Mode(true);
+    });
+
+    app.controller("ViewMemesController", [
+            "$scope", "$http",
+            function($scope, $http){
+
+        $scope.memes = null;
+
+        $scope.vote = function(meme, score) {
+            // If You're clicking on something you've already voted for
+            // then unvote for it.
+            if (meme.score === score) {
+                score = 0;
+            }
+
+            meme.score = score;
+            $http.post("/rpc/vote/" + meme.id, {"score": score}).success(function(data){
+                meme.votes_up = data.data.votes_up;
+                meme.votes_down = data.data.votes_down;
+            });
+        };
+
+        $http.get("/rpc/list_memes").success(function(data){
+            $scope.memes = data.data.memes;
+        });
+
+    }]);
+
+})();
+</script>
 {% endblock %}

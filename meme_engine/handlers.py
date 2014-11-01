@@ -3,9 +3,10 @@ import re
 
 from google.appengine.ext import db
 from google.appengine.api import images
+from google.appengine.api import memcache
 
 from .util import MemeEngineRequestHandler, get_image, trim_data_url
-from .models import Template, Meme, MemeComment
+from .models import Template, Meme, MemeComment, Vote
 
 
 def normalize_name(name):
@@ -108,7 +109,64 @@ class TemplateView(MemeEngineRequestHandler):
         self.render("template.html", template=template)
 
 
-class MemesView(MemeEngineRequestHandler):
+class VoteForMeme(MemeEngineRequestHandler):
+
+    score_transition = {
+        -1: {
+            -1: (0, 0),
+             0: (0, -1),
+             1: (1, -1),
+        },
+        0: {
+            -1: (0, 1),
+             0: (0, 0),
+             1: (1, 0),
+        },
+        1: {
+            -1: (-1, 1),
+             0: (-1, 0),
+             1: (0, 0),
+        },
+    }
+
+    def post(self, meme_id):
+        request = json.loads(self.request.body)
+        score = int(request.get("score"))
+
+        meme_id = int(meme_id)
+
+        if score not in (-1, 0, 1):
+            return self.error(400)
+
+        meme = Meme.get_by_id(meme_id)
+        if meme is None:
+            return self.error(404)
+
+        key_name = "vote-%s-%s" % (meme_id, self.email)
+
+        vote = Vote.get_or_insert(key_name)
+        votes_up, votes_down = self.score_transition[vote.score][score]
+
+        if any([votes_up, votes_down]):
+            if votes_up:
+                meme.votes_up += votes_up
+
+            if votes_down:
+                meme.votes_down += votes_down
+
+            meme.put()
+
+        vote.score = score
+        vote.put()
+        memcache.set(key_name, score)
+
+        self.render_json({
+            "votes_up": meme.votes_up,
+            "votes_down": meme.votes_down,
+        })
+
+
+class ListMemes(MemeEngineRequestHandler):
     def get(self):
 
         offset = int(self.request.get("offset", 0))
@@ -118,7 +176,14 @@ class MemesView(MemeEngineRequestHandler):
 
         memes = Meme.all().filter("enabled = ", True).order("-added").fetch(limit, offset)
 
-        self.render("memes.html", memes=memes, args=self.request.GET, offset=offset, limit=limit)
+        self.render_json({
+            "memes": [meme.as_dict(self.email) for meme in memes]
+        })
+
+
+class MemesView(MemeEngineRequestHandler):
+    def get(self):
+        self.render("memes.html")
 
 
 class MemeView(MemeEngineRequestHandler):
