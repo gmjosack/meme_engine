@@ -3,28 +3,21 @@ import webapp2
 from . import handlers
 
 application = webapp2.WSGIApplication([
-    ('/', handlers.MemesView),
+    ("/", handlers.NgAppView),
+    ("/image", handlers.Image),
 
-    ('/template', handlers.TemplatesView),
-    ('/template/(?P<template_id>[\d]+)/?', handlers.TemplateView),
+    ("/api/template", handlers.TemplatesHandler),
+    ("/api/template/(?P<template_id>[\d]+)", handlers.TemplateHandler),
 
-    ('/meme', handlers.MemesView),
-    ('/meme/(?P<meme_id>[\d]+)/?', handlers.MemeView),
-    ('/meme/(?P<meme_id>[\d]+)/delete/?', handlers.DeleteMeme),
-    ('/meme/(?P<meme_id>[\d]+)/add_comment/?', handlers.AddMemeComment),
+    ("/api/meme", handlers.MemesHandler),
+    ("/api/meme/(?P<meme_id>[\d]+)", handlers.MemeHandler),
+    ("/api/meme/(?P<meme_id>[\d]+)/comments", handlers.MemeCommentsHandler),
+    ("/api/meme/(?P<meme_id>[\d]+)/vote", handlers.MemeVoteHandler),
+    ("/api/meme/(?P<meme_id>[\d]+)/delete", handlers.MemeDeleteHandler),
 
-    ('/add_template', handlers.AddTemplate),
-    ('/create_meme', handlers.CreateMeme),
+    ("/admin/__update_schema", handlers.UpdateSchema),
+    ("/admin/__fix_comment_counts", handlers.FixCommentCounts),
 
-    ('/image', handlers.Image),
-
-    ('/rpc/list_templates', handlers.ListTemplates),
-    ('/rpc/list_memes', handlers.ListMemes),
-    ('/rpc/upload_meme', handlers.UploadMeme),
-    ('/rpc/list_meme_comments/(?P<meme_id>[\d]+)/?', handlers.ListMemeComments),
-    ('/rpc/vote/(?P<meme_id>[\d]+)/?', handlers.VoteForMeme),
-
-    ('/admin/__update_schema', handlers.UpdateSchema),
-    ('/admin/__fix_comment_counts', handlers.FixCommentCounts),
+    ("/.*", handlers.NgAppView),
 
 ], debug=True)

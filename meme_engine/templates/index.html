@@ -1,9 +1,48 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+{% autoescape true %}
+<html ng-app="memeEngine">
+    <head>
+        <title>MemeEngine</title>
+        <link href="/static/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="/static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" media="screen">
+        <link href="/static/css/meme-engine.css" rel="stylesheet" media="screen">
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <nav class="navbar navbar-static-top navbar-default" role="navigation">
+                    <div class="col-sm-10 col-sm-offset-1">
+                        <a class="navbar-brand" href="/">meme-engine.</a>
+                        <ul class="nav navbar-nav">
+                            <li><a href="/template">Browse Templates</a></li>
+                        </ul>
 
-{% block content %}
-    {% for meme in memes %}
-        <a href="/meme/{{meme.key().id()}}">
-            <img width="{{meme.thumb_width}}", height="{{meme.thumb_height}}" src="/image?key={{meme.key()}}">
-        </a>
-    {% endfor %}
-{% endblock %}
+                        <ul class="nav navbar-right navbar-nav">
+                            <li><a class="btn btn-danger" href="/create_meme">Create Meme</a></li>
+                            <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                            <li><a class="btn btn-danger" href="/add_template">Add Template</a></li>
+                            <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                            <li>&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                        </ul>
+
+                    </div>
+                </nav>
+            </div>
+
+            <div class="row content">
+                <div class="col-md-12 text-center">
+                    <ng-view></ng-view>
+                </div>
+            </div>
+        </div>
+
+        <script src="/static/vendor/jquery/dist/jquery.min.js"></script>
+        <script src="/static/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="/static/vendor/lodash/dist/lodash.min.js"></script>
+        <script src="/static/vendor/canvas-text-wrapper/CanvasTextWrapper.js"></script>
+        <script src="/static/vendor/angular/angular.js"></script>
+        <script src="/static/vendor/angular-route/angular-route.min.js"></script>
+        <script src="/static/js/app.js"></script>
+    </body>
+</html>
+{% endautoescape %}

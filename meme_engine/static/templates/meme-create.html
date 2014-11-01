@@ -1,0 +1,46 @@
+<div>
+    <div class="row">
+        <div class="col-md-7">
+            <div>
+                <canvas id="meme-canvas"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div ng-if="templates">
+                <div ng-if="errMsg" class="alert alert-danger">[[errMsg]]</div>
+
+                <div class="form-group">
+                    <label>Template</label>
+                    <select class="form-control" ng-model="$parent.selectedTemplate"
+                            ng-options="template.name for template in templates"
+                            focus
+                    ></select>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" ng-model="texts.topText"
+                           ng-keyup="writeText()" id="top-text"
+                           placeholder="Top Text"
+                           class="form-control"
+                      >
+                </div>
+                <div class="form-group">
+                    <input type="text" ng-model="texts.bottomText"
+                           ng-keyup="writeText()" id="bottom-text"
+                           placeholder="Bottom Text"
+                           class="form-control"
+                    >
+                </div>
+                <div>
+                    <button class="btn btn-danger"
+                            ng-disabled="!selectedTemplate || uploading"
+                            ng-click="uploadMeme()">Create!
+                    </button>
+                </div>
+            </div>
+            <div ng-if="!templates">
+                <i class="fa fa-2x fa-spinner fa-spin"></i>
+            </div>
+        </div>
+    </div>
+</div>

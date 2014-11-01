@@ -1,0 +1,47 @@
+<div class="row">
+    <div class="col-md-6">
+        <img class="meme-img" ng-src="/image?key=[[meme.key]]">
+        <hr>
+        <a ng-if="showDelete" class="btn btn-danger" ng-href="/meme/[[meme.id]]/delete">Delete Meme</a>
+    </div>
+
+    <div class="col-md-4 text-left">
+        <div>
+            <strong>Top Text:</strong> [[ meme.top_text ]]
+        </div>
+        <div>
+            <strong>Bottom Text:</strong> [[ meme.bottom_text ]]
+        </div>
+        <div>
+            <strong>Added By:</strong> [[ meme.author ]]
+        </div>
+        <div>
+            <strong>Added On:</strong> [[ meme.added ]]
+        </div>
+
+        <hr>
+
+        <div><strong>Discussion:</strong></div>
+        <br>
+
+        <div ng-if="comments === null" class="text-center">
+            <i class="fa fa-2x fa-spinner fa-spin"></i>
+        </div>
+
+        <div ng-if="comments !== null">
+            <blockquote ng-if="comments.length" ng-repeat="comment in comments">
+                [[comment.comment]]
+                <footer>[[comment.author]]</footer>
+            </blockquote>
+
+            <form role="form" method="post" action="[['/api/meme/' + meme.id + '/comments']]">
+                <div class="form-group">
+                    <textarea placeholder="Comment" class="form-control" ng-model="comment" name="comment"></textarea>
+                </div>
+                <input ng-disabled="!comment.length" class="btn btn-danger" type="submit" value="Add Comment">
+            </form>
+        </div>
+
+
+    </div>
+</div>

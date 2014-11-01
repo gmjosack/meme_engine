@@ -51,6 +51,7 @@ class MemeEngineRequestHandler(webapp2.RequestHandler):
         self.response.write(_template.render(kwargs))
 
     def render_json(self, data):
+        self.response.headers["Content-Type"] = "application/json"
         self.response.write(json.dumps({
             "data": data,
         }))

@@ -17,49 +17,119 @@ def normalize_name(name):
     return name.strip("_")
 
 
-class ListTemplates(MemeEngineRequestHandler):
+class NgAppView(MemeEngineRequestHandler):
     def get(self):
+        self.render("index.html")
+
+
+class Image(MemeEngineRequestHandler):
+    def get(self):
+
+        self.response.headers["Content-Type"] = "image/png"
+        self.response.headers["Cache-Control"] = "max-age=31556926"
+        # These never change. Data taken from Last-Modified example in
+        # rfc2616 and is otherwise arbitrary.
+        self.response.headers["Last-Modified"] = "Tue, 15 Nov 1994 12:45:26 GMT"
+        self.response.headers["Expires"] = "Mon, 23 Jan 2023 00:00:00 GMT"
+
+        if "If-Modified-Since" in self.request.headers:
+            return self.response.set_status(304)
+
+        try:
+            image = db.get(self.request.get("key"))
+        except db.BadKeyError:
+            return self.error(404)
+
+        if image is None:
+            return self.error(404)
+
+        self.response.out.write(image.image)
+
+
+# API Handlers
+
+
+class TemplatesHandler(MemeEngineRequestHandler):
+    def get(self):
+        offset = int(self.request.get("offset", 0))
+        limit = int(self.request.get("limit", 20))
+        if limit > 20:
+            limit = 20
+
         templates = Template.all()
 
         name = self.request.get("name")
         if name:
             name = normalize_name(name)
-            templates.filter("name >=", name).filter('name <', name + u'\ufffd')
+            templates = templates.filter("name >=", name).filter('name <', name + u'\ufffd')
+
+        templates = templates.filter("enabled =", True)
+        templates = templates.order("-added").fetch(limit, offset)
+
 
         self.render_json({
-            "templates": [template.as_dict() for template in templates]
+            "templates": [template.as_dict() for template in templates],
+            "offset": offset,
+            "limit": limit,
+        })
+
+    def post(self):
+
+        name = self.request.get("name")
+        name = normalize_name(name)
+        if not name:
+            self.error(400)
+            return self.render_json({
+                "error": "Name is a required field",
+            })
+
+        try:
+            template_image = get_image(self.request.get("template_file"))
+        except images.Error as err:
+            self.error(400)
+            return self.render_json({
+                "error": err,
+            })
+
+        try:
+            template = Template.upload(name, self.email, template_image)
+        except ValueError as err:
+            self.error(400)
+            return self.render_json({
+                "error": ", ".join(err),
+            })
+
+        self.redirect("/template/%s" % template.key().id())
+
+
+class TemplateHandler(MemeEngineRequestHandler):
+    def get(self, template_id):
+        template = Template.get_by_id(int(template_id))
+
+        if template is None or not template.enabled:
+            return self.error(404)
+
+        self.render_json({
+            "template": template.as_dict(),
         })
 
 
-class ListMemeComments(MemeEngineRequestHandler):
-    def get(self, meme_id):
-        meme = Meme.get_by_id(int(meme_id))
+class MemesHandler(MemeEngineRequestHandler):
+    def get(self):
+
+        offset = int(self.request.get("offset", 0))
+        limit = int(self.request.get("limit", 20))
+        if limit > 20:
+            limit = 20
+
+        memes = Meme.all().filter("enabled = ", True).order("-added").fetch(limit, offset)
 
         self.render_json({
-            "comments": [comment.as_dict() for comment in meme.comments.order("added")]
+            "memes": [meme.as_dict(self.email) for meme in memes],
+            "offset": offset,
+            "limit": limit,
         })
 
-
-class AddMemeComment(MemeEngineRequestHandler):
-
-    def post(self, meme_id):
-
-        meme = Meme.get_by_id(int(meme_id))
-
-        comment = self.request.get("comment")
-        if not comment:
-            self.redirect("/meme/%s" % meme.key().id())
-
-
-        comment = MemeComment(comment=comment, author=self.email, meme=meme)
-        comment.put()
-        meme.num_comments = meme.num_comments + 1
-        meme.put()
-
-        self.redirect("/meme/%s" % meme.key().id())
-
-
-class UploadMeme(MemeEngineRequestHandler):
     def post(self):
 
 
@@ -86,30 +156,45 @@ class UploadMeme(MemeEngineRequestHandler):
         })
 
 
-class TemplatesView(MemeEngineRequestHandler):
-    def get(self):
+class MemeHandler(MemeEngineRequestHandler):
+    def get(self, meme_id):
+        meme = Meme.get_by_id(int(meme_id))
 
-        offset = int(self.request.get("offset", 0))
-        limit = int(self.request.get("limit", 20))
-        if limit > 20:
-            limit = 20
-
-        templates = Template.all().filter("enabled = ", True).order("-added").fetch(limit, offset)
-
-        self.render("templates.html", templates=templates, args=self.request.GET, offset=offset, limit=limit)
-
-
-class TemplateView(MemeEngineRequestHandler):
-    def get(self, template_id):
-        template = Template.get_by_id(int(template_id))
-
-        if not template.enabled:
+        if meme is None or not meme.enabled:
             return self.error(404)
 
-        self.render("template.html", template=template)
+        self.render_json({
+            "meme": meme.as_dict(),
+            "show_delete": self.email == meme.author,
+        })
 
 
-class VoteForMeme(MemeEngineRequestHandler):
+class MemeCommentsHandler(MemeEngineRequestHandler):
+    def get(self, meme_id):
+        meme = Meme.get_by_id(int(meme_id))
+
+        self.render_json({
+            "comments": [comment.as_dict() for comment in meme.comments.order("added")]
+        })
+
+    def post(self, meme_id):
+
+        meme = Meme.get_by_id(int(meme_id))
+
+        comment = self.request.get("comment")
+        if not comment:
+            self.redirect("/meme/%s" % meme.key().id())
+
+
+        comment = MemeComment(comment=comment, author=self.email, meme=meme)
+        comment.put()
+        meme.num_comments = meme.num_comments + 1
+        meme.put()
+
+        self.redirect("/meme/%s" % meme.key().id())
+
+
+class MemeVoteHandler(MemeEngineRequestHandler):
 
     score_transition = {
         -1: {
@@ -166,53 +251,11 @@ class VoteForMeme(MemeEngineRequestHandler):
         })
 
 
-class ListMemes(MemeEngineRequestHandler):
-    def get(self):
-
-        offset = int(self.request.get("offset", 0))
-        limit = int(self.request.get("limit", 20))
-        if limit > 20:
-            limit = 20
-
-        memes = Meme.all().filter("enabled = ", True).order("-added").fetch(limit, offset)
-
-        self.render_json({
-            "memes": [meme.as_dict(self.email) for meme in memes]
-        })
-
-
-class MemesView(MemeEngineRequestHandler):
-    def get(self):
-        self.render("memes.html")
-
-
-class MemeView(MemeEngineRequestHandler):
-    def get(self, meme_id):
-        meme = Meme.get_by_id(int(meme_id))
-
-        if not meme.enabled:
-            return self.error(404)
-
-        self.render("meme.html", meme=meme, author=self.email)
-
-
-class DeleteMeme(MemeEngineRequestHandler):
-    def get(self, meme_id):
-        meme = Meme.get_by_id(int(meme_id))
-
-        if not meme.enabled:
-            return self.error(404)
-
-        if meme.author != self.email:
-            return self.error(403)
-
-        self.render("delete-meme.html", meme=meme, author=self.email)
-
+class MemeDeleteHandler(MemeEngineRequestHandler):
     def post(self, meme_id):
-        print meme_id
         meme = Meme.get_by_id(int(meme_id))
 
-        if not meme.enabled:
+        if not meme or not meme.enabled:
             return self.error(404)
 
         if meme.author != self.email:
@@ -224,59 +267,7 @@ class DeleteMeme(MemeEngineRequestHandler):
         self.redirect("/")
 
 
-class CreateMeme(MemeEngineRequestHandler):
-    def get(self):
-        self.render("create_meme.html")
-
-
-class Image(MemeEngineRequestHandler):
-    def get(self):
-
-        self.response.headers["Content-Type"] = "image/png"
-        self.response.headers["Cache-Control"] = "max-age=31556926"
-        # These never change. Data taken from Last-Modified example in
-        # rfc2616 and is otherwise arbitrary.
-        self.response.headers["Last-Modified"] = "Tue, 15 Nov 1994 12:45:26 GMT"
-        self.response.headers["Expires"] = "Mon, 23 Jan 2023 00:00:00 GMT"
-
-        if "If-Modified-Since" in self.request.headers:
-            return self.response.set_status(304)
-
-        try:
-            image = db.get(self.request.get("key"))
-        except db.BadKeyError:
-            return self.error(404)
-
-        if image is None:
-            return self.error(404)
-
-        self.response.out.write(image.image)
-
-
-class AddTemplate(MemeEngineRequestHandler):
-
-    def get(self):
-        self.render("add_template.html")
-
-
-    def post(self):
-
-        name = self.request.get("name")
-        name = normalize_name(name)
-        if not name:
-            return self.render("add_template.html", error="Name is a required field")
-
-        try:
-            template_image = get_image(self.request.get("template_file"))
-        except images.Error as err:
-            return self.render("add_template.html", error=err)
-
-        try:
-            template = Template.upload(name, self.email, template_image)
-        except ValueError as err:
-            return self.render("add_template.html", error=err)
-
-        self.redirect("/template/%s" % template.key().id())
+# Admin Handlers
 
 
 class UpdateSchema(MemeEngineRequestHandler):
@@ -300,4 +291,3 @@ class FixCommentCounts(MemeEngineRequestHandler):
         for meme in memes:
             meme.num_comments = meme.comments.count()
             meme.put()
-

@@ -125,6 +125,16 @@ class Meme(db.Model):
             "key": str(self.key()),
             "id": self.key().id(),
 
+            "top_text": self.top_text,
+            "bottom_text": self.bottom_text,
+
+            "author": self.author,
+
+            "width": self.width,
+            "height": self.height,
+
+            "added": str(self.added),
+
             "thumb_width": self.thumb_width,
             "thumb_height": self.thumb_height,
             "num_comments": self.num_comments,

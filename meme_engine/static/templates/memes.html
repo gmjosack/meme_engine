@@ -1,0 +1,22 @@
+<div ng-repeat="meme in memes" class="thumbnail-img">
+    <a ng-href="/meme/[[meme.id]]">
+        <img width="[[meme.thumb_width]]", height="[[meme.thumb_height]]" ng-src="/image?key=[[meme.key]]">
+        <span class="num-comments">[[meme.num_comments]] <i class="fa fa-comments"></i></span>
+    </a>
+    <div class=votes>
+        <span class="vote">[[ meme.votes_up - meme.votes_down ]]</span>
+        <a class="vote" title="Dislike!" ng-click="vote(meme, -1)">
+            <i ng-class="{
+                    'fa-thumbs-down': meme.score === -1,
+                    'fa-thumbs-o-down': meme.score !== -1}"
+               class="fa fa-thumbs-o-down"></i>
+        </a>
+        <a class="vote" title="Like!" ng-click="vote(meme, 1)">
+            <i ng-class="{
+                    'fa-thumbs-up': meme.score === 1,
+                    'fa-thumbs-o-up': meme.score !== 1}"
+               class="fa fa-thumbs-o-up"></i>
+        </a>
+    </div>
+</div>
+<hr>
