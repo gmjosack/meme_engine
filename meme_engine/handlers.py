@@ -96,7 +96,7 @@ class TemplatesHandler(MemeEngineRequestHandler):
         except images.Error as err:
             self.error(400)
             return self.render_json({
-                "error": err,
+                "error": str(err),
             })
 
         try:
@@ -104,7 +104,7 @@ class TemplatesHandler(MemeEngineRequestHandler):
         except ValueError as err:
             self.error(400)
             return self.render_json({
-                "error": ", ".join(err),
+                "error": str(err),
             })
 
         self.redirect("/template/%s" % template.key().id())
