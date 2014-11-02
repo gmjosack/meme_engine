@@ -28,25 +28,28 @@ blockquote {
     max-width: 100%;
 }
 
-div.thumbnail-img {
+div.thumbnail-container {
     display: inline-block;
-    vertical-align: middle;
-    line-height: 410px;
-    text-align: center;
-    height: 410px;
-    width: 410px;
+    min-height: 410px;
     margin: 5px;
-    position: relative;
+    width: 410px;
     background-color: whitesmoke;
     border-radius: 5px;
     box-shadow: 2px 2px 3px 1px rgba(216, 216, 216, 1);
 }
 
+div.thumbnail-img {
+    line-height: 410px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+div.thumbnail-footer {
+    height: 30px;
+}
+
 span.num-comments {
-    position: absolute;
-    top: 185px;
-    left: 15px;
-    z-index: 10;
+    padding-left: 10px;
     color: #d9534f;
     font-family: Verdana, Geneva, sans-serif;
     font-size: large;
@@ -58,11 +61,14 @@ span.num-comments:hover {
     text-shadow: none;
 }
 
-div.votes {
-    position: absolute;
-    top: 185px;
-    right: 15px;
-    z-index: 10;
+.thumbnail-container hr {
+    margin-top: 1px;
+    margin-bottom: 5px;
+    border-top: 2px solid #E2E2E2;
+}
+
+.votes {
+    padding-right: 10px;
     color: #d9534f;
     font-family: Verdana, Geneva, sans-serif;
     font-size: large;
@@ -88,15 +94,6 @@ div.votes {
 a.vote:hover {
     text-shadow: none;
     text-decoration: none;
-}
-
-
-span.delete-meme {
-    position: absolute;
-    top: -190px;
-    left: 10px;
-    z-index: 10;
-    color: #d9534f;
 }
 
 .navbar-default {

@@ -38,10 +38,10 @@ appcfg.py update
 
 ## TODO
 
- * Pagination
- * Like/Dislike
  * Sorting
- * Search (The search bar doesn't do anything currently)
+ * Search
  * User Pages (show memes from that user)
  * Show Memes created with a template on template page
+ * Error Handling on Add Template Page
+ * Lots of memcache
  * Animated GIF support

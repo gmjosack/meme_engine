@@ -1,8 +1,11 @@
-<a ng-repeat="template in templates" ng-href="/template/[[template.id]]">
+<div ng-repeat="template in templates" class="thumbnail-container">
     <div class="thumbnail-img">
-        <img width="[[template.thumb_width]]", height="[[template.thumb_height]]" ng-src="/image?key=[[template.key]]">
+        <a ng-href="/template/[[template.id]]">
+            <img width="[[template.thumb_width]]", height="[[template.thumb_height]]" ng-src="/image?key=[[template.key]]">
+        </a>
     </div>
-</a>
+</div>
+
 <hr>
 
 <div class="btn-group">
