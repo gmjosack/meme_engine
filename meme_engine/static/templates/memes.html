@@ -6,10 +6,12 @@
     </div>
     <hr>
     <div class="thumbnail-footer">
-        <span class="pull-left num-comments">[[meme.num_comments]] <i class="fa fa-comments"></i></span>
+        <a ng-href="/meme/[[meme.id]]">
+            <span class="pull-left num-comments">[[meme.num_comments]] <i class="fa fa-comments"></i></span>
+        </a>
 
         <span class="pull-right votes">
-            <span class="vote">[[ meme.votes_up - meme.votes_down ]]</span>
+            <span title="+[[meme.votes_up]]/-[[meme.votes_down]]" class="vote">[[ meme.votes_up - meme.votes_down ]]</span>
             <a class="vote" title="Dislike!" ng-click="vote(meme, -1)">
                 <i ng-class="{
                         'fa-thumbs-down': meme.score === -1,
