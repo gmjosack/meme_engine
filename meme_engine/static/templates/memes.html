@@ -11,13 +11,13 @@
         </a>
 
         <span class="pull-right votes">
-            <span title="+[[meme.votes_up]]/-[[meme.votes_down]]" class="vote">[[ meme.votes_up - meme.votes_down ]]</span>
             <a class="vote" title="Dislike!" ng-click="vote(meme, -1)">
                 <i ng-class="{
                         'fa-thumbs-down': meme.score === -1,
                         'fa-thumbs-o-down': meme.score !== -1}"
-                   class="fa fa-thumbs-o-down"></i>
+                   class="fa fa-flip-horizontal fa-thumbs-o-down"></i>
             </a>
+            <span title="+[[meme.votes_up]]/-[[meme.votes_down]]" class="vote">[[ meme.votes_up - meme.votes_down ]]</span>
             <a class="vote" title="Like!" ng-click="vote(meme, 1)">
                 <i ng-class="{
                         'fa-thumbs-up': meme.score === 1,
